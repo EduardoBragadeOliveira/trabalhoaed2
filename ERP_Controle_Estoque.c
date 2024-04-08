@@ -13,7 +13,7 @@ typedef struct{
     int qtde;
 } LISTA;
 
-void inicializarFila(LISTA *lista){
+void inicializarLista(LISTA *lista){
     lista->qtde = 0;
 }
 
@@ -123,7 +123,7 @@ int main() {
 
     LISTA lista;
 
-    inicializarFila(&lista);
+    inicializarLista(&lista);
     menuAcoes(lista);
 
     return 0;
