@@ -13,7 +13,7 @@ typedef struct{
     int qtde;
 } LISTA;
 
-void inicializarFila(LISTA *lista){
+void inicializarLista(LISTA *lista){
     lista->qtde = 0;
 }
 
@@ -68,6 +68,18 @@ void removerproduto(LISTA *lista){
         lista->qtde--;
     }
 }
+
+void listarProdutos(LISTA *lista){
+    
+    printf("----------------------------------\n");
+    for(int i = 0; i < lista->qtde; i++){
+        printf("ProdutoID: %d\n", lista->registros[i].idProduto);
+        printf("Nome Produto: %s\n", lista->registros[i].nomeProduto);
+        printf("Quantidade Produto: %d\n", lista->registros[i].quantidadeProduto);
+        printf("----------------------------------\n");
+    }
+}
+
 void menuAcoes(LISTA lista){
     int opcao;
 
@@ -100,7 +112,7 @@ void menuAcoes(LISTA lista){
                 // Implementar exclusão de produto
                 break;
             case 5:
-                // Implementar listagem de produtos
+                listarProdutos(&lista);
                 break;
             case 6:
                 // Implementar ordenação dos produtos
@@ -123,7 +135,7 @@ int main() {
 
     LISTA lista;
 
-    inicializarFila(&lista);
+    inicializarLista(&lista);
     menuAcoes(lista);
 
     return 0;
