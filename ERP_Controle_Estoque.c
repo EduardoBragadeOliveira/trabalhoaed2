@@ -58,6 +58,30 @@ void buscarProduto(LISTA *lista){
     }
 }
 
+void salvar_dados(LISTA *lista){
+    char *nome_temp[20];
+    int id_temp;
+    int qntd_temp;
+    FILE *arquivo = fopen("arquivo.txt", "w");
+    if (!arquivo) {
+        printf("Erro ao abrir arquivo para escrita.\n");
+    }
+    if(lista->qtde > 0){
+        for(int i = 0; i < lista->qtde; i++){
+            *nome_temp = NULL;
+            *nome_temp = lista->registros[i].nomeProduto;
+            id_temp = lista->registros[i].idProduto;
+            qntd_temp = lista->registros[i].quantidadeProduto;
+            fprintf(arquivo, "%05d \n%s \n%03d \n",id_temp, *nome_temp, qntd_temp);
+            printf("%d salvo com sucesso\n");
+        }
+        fclose(arquivo);
+    }else{
+        printf("A lista esta vazia!\n");
+    }
+
+}
+
 void menuAcoes(LISTA lista){
     int opcao;
 
@@ -98,7 +122,7 @@ void menuAcoes(LISTA lista){
                 // Implementar busca de dados do arquivo de texto
                 break;
             case 8:
-                // salvar dados em arquivo de texto
+                salvar_dados(&lista);
             case 9:
                 printf("Saindo do programa...\n");
                 break;
