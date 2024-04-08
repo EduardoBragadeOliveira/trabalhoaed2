@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TAM 10
+
+typedef struct{
+    char nome[20];
+    int ProdutoID;
+    int quantidade;
+} REGISTRO; //   *PRODUTO*
+
+typedef struct{
+    REGISTRO registros[TAM];
+    int qtde;
+} LISTA;
+
+void inicializar(LISTA *lista){
+    lista->qtde = 0;
+}
+
+void inserirProduto(LISTA *lista) {
+    int id;
+
+    if (lista->qtde < TAM) {
+        printf("entre com o nome do produto: ");
+        scanf("%s", lista->registros[lista->qtde].nome);
+
+        do{
+            printf("entre com o id: ");
+            scanf("%d", &id);
+        }while (id == lista->registros[lista->qtde].ProdutoID); //enquanto o id que eu entrei for igual a algum id ja cadastrado ele fica no laco.
+        
+        lista->registros[lista->qtde].ProdutoID = id;
+        
+        printf("Digite a quantidade do produto: ");
+        scanf("%d", &lista->registros[lista->qtde].quantidade);
+        
+        lista->qtde++;
+        printf("Produto inserido com sucesso!\n");
+
+    } else {
+        printf("A lista de produtos está cheia!\n");
+    }
+}
+
+void buscarProduto(LISTA *lista){
+    int ID;
+    printf("ID do produto a ser procurado: ");
+    scanf("%d", &ID);
+
+   int i=0; // nao sei pq mas com o for nao estava dando certo, no Do While foi
+    do{
+        if (lista->registros[i].ProdutoID == ID) {
+            printf("produto encontrado!\n");
+            printf("Nome do produto: %s\n", lista->registros[i].nome);
+            printf("Quantidade: %d\n", lista->registros[i].quantidade);
+            printf("ID do produto: %d\n", lista->registros[i].ProdutoID);
+        }
+    i++;
+    }while(i<lista->qtde);
+
+}
+
+int main() {
+
+    LISTA lista;
+
+    int opcao;
+    do {
+        printf("\n---- Menu ----\n");
+        printf("1. Inserir produto\n");
+        printf("2. Buscar produto\n");
+        printf("3. Atualizar estoque\n");
+        printf("4. Excluir produto\n");
+        printf("5. Listar estoque\n");
+        printf("6. Ordenar estoque\n");
+        printf("7. buscar dados\n");
+        printf("8. Salvar dados\n");
+        printf("9. Sair\n");
+        printf("escolha uma opcao: ");
+        scanf("%d", &opcao);
+
+        inicializar(&lista);
+
+        switch (opcao) {
+            case 1:
+                inserirProduto(&lista);
+                break;
+            case 2:
+                buscarProduto(&lista);
+                break;
+            case 3:
+                // Implementar atualização de estoque(mudar algum produto)
+                break;
+            case 4:
+                // Implementar exclusão de produto
+                break;
+            case 5:
+                // Implementar listagem de produtos
+                break;
+            case 6:
+                // Implementar ordenação dos produtos
+                break;
+            case 7:
+                // Implementar busca de dados do arquivo de texto
+                break;
+            case 8:
+                // salvar dados em arquivo de texto
+            case 9:
+                printf("Saindo do programa...\n");
+                break;
+            default:
+                printf("Opcao invalida!\n");
+        }
+    } while (opcao != 9);
+
+    return 0;
+}
