@@ -37,7 +37,7 @@ void inserirProduto(LISTA *lista) {
     }
 }
 
-void buscarProduto(LISTA *lista){
+int buscarProduto(LISTA *lista){
     int id, produtoEncontrado = 0;
 
     printf("Digite o id do produto a ser pesquisado: ");
@@ -56,8 +56,18 @@ void buscarProduto(LISTA *lista){
     if(produtoEncontrado == 0){
         printf("ID do produto invalido!\n");
     }
+    return 0;
 }
-
+void removerproduto(LISTA *lista){
+     int pos = buscarProduto(lista);
+    if(pos>=0){
+        for(int i = pos; i < lista->qtde - 1; i++){
+            lista->registros[i] = lista->registros[i+1];
+        }
+        printf("item  removido!");
+        lista->qtde--;
+    }
+}
 void menuAcoes(LISTA lista){
     int opcao;
 
@@ -86,6 +96,7 @@ void menuAcoes(LISTA lista){
                 // Implementar atualização de estoque(mudar algum produto)
                 break;
             case 4:
+            removerproduto(&lista);
                 // Implementar exclusão de produto
                 break;
             case 5:
