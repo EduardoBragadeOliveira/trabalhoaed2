@@ -1,71 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #define TAM 10
 
 typedef struct{
-    char nome[20];
-    int ProdutoID;
-    int quantidade;
-} REGISTRO; //   *PRODUTO*
+    char nomeProduto[20];
+    int idProduto;
+    int quantidadeProduto;
+} REGISTRO;
 
 typedef struct{
     REGISTRO registros[TAM];
     int qtde;
 } LISTA;
 
-void inicializar(LISTA *lista){
+void inicializarFila(LISTA *lista){
     lista->qtde = 0;
 }
 
 void inserirProduto(LISTA *lista) {
-    int id;
+    REGISTRO r;
 
-    if (lista->qtde < TAM) {
-        printf("entre com o nome do produto: ");
-        scanf("%s", lista->registros[lista->qtde].nome);
+    if(lista->qtde < TAM){
+        printf("Digite o nome do produto: ");
+        scanf("%s", &r.nomeProduto);
 
-        do{
-            printf("entre com o id: ");
-            scanf("%d", &id);
-        }while (id == lista->registros[lista->qtde].ProdutoID); //enquanto o id que eu entrei for igual a algum id ja cadastrado ele fica no laco.
-        
-        lista->registros[lista->qtde].ProdutoID = id;
-        
         printf("Digite a quantidade do produto: ");
-        scanf("%d", &lista->registros[lista->qtde].quantidade);
-        
-        lista->qtde++;
-        printf("Produto inserido com sucesso!\n");
+        scanf("%d", &r.quantidadeProduto);
 
-    } else {
-        printf("A lista de produtos está cheia!\n");
+        r.idProduto = lista->qtde + 1;
+
+        lista->registros[lista->qtde] = r;
+
+        lista->qtde++;
+
+        printf("Produto salvo com o id: %d", r.idProduto);
     }
 }
 
 void buscarProduto(LISTA *lista){
-    int ID;
-    printf("ID do produto a ser procurado: ");
-    scanf("%d", &ID);
+    int id, produtoEncontrado = 0;
 
-   int i=0; // nao sei pq mas com o for nao estava dando certo, no Do While foi
-    do{
-        if (lista->registros[i].ProdutoID == ID) {
-            printf("produto encontrado!\n");
-            printf("Nome do produto: %s\n", lista->registros[i].nome);
-            printf("Quantidade: %d\n", lista->registros[i].quantidade);
-            printf("ID do produto: %d\n", lista->registros[i].ProdutoID);
+    printf("Digite o id do produto a ser pesquisado: ");
+    scanf("%d", &id);
+
+    for(int i = 0; i < lista->qtde; i++){
+        if(lista->registros[i].idProduto == id){
+            printf("Produto encontrado!\n");
+            printf("Nome do produto: %s\n", lista->registros[i].nomeProduto);
+            printf("Quantidade: %d\n", lista->registros[i].quantidadeProduto);
+            printf("ID do produto: %d\n", lista->registros[i].idProduto);
+            produtoEncontrado = 1;
         }
-    i++;
-    }while(i<lista->qtde);
+    }
 
+    if(produtoEncontrado == 0){
+        printf("ID do produto invalido!\n");
+    }
 }
 
-int main() {
-
-    LISTA lista;
-
+void menuAcoes(LISTA lista){
     int opcao;
+
     do {
         printf("\n---- Menu ----\n");
         printf("1. Inserir produto\n");
@@ -79,8 +74,6 @@ int main() {
         printf("9. Sair\n");
         printf("escolha uma opcao: ");
         scanf("%d", &opcao);
-
-        inicializar(&lista);
 
         switch (opcao) {
             case 1:
@@ -113,6 +106,14 @@ int main() {
                 printf("Opcao invalida!\n");
         }
     } while (opcao != 9);
+}
+
+int main() {
+
+    LISTA lista;
+
+    inicializarFila(&lista);
+    menuAcoes(lista);
 
     return 0;
 }
