@@ -13,7 +13,7 @@ typedef struct{
     int qtde;
 } LISTA;
 
-void inicializarFila(LISTA *lista){
+void inicializarLista(LISTA *lista){
     lista->qtde = 0;
 }
 
@@ -37,7 +37,7 @@ void inserirProduto(LISTA *lista) {
     }
 }
 
-void buscarProduto(LISTA *lista){
+int buscarProduto(LISTA *lista){
     int id, produtoEncontrado = 0;
 
     printf("Digite o id do produto a ser pesquisado: ");
@@ -55,6 +55,28 @@ void buscarProduto(LISTA *lista){
 
     if(produtoEncontrado == 0){
         printf("ID do produto invalido!\n");
+    }
+    return 0;
+}
+void removerproduto(LISTA *lista){
+     int pos = buscarProduto(lista);
+    if(pos>=0){
+        for(int i = pos; i < lista->qtde - 1; i++){
+            lista->registros[i] = lista->registros[i+1];
+        }
+        printf("item  removido!");
+        lista->qtde--;
+    }
+}
+
+void listarProdutos(LISTA *lista){
+    
+    printf("----------------------------------\n");
+    for(int i = 0; i < lista->qtde; i++){
+        printf("ProdutoID: %d\n", lista->registros[i].idProduto);
+        printf("Nome Produto: %s\n", lista->registros[i].nomeProduto);
+        printf("Quantidade Produto: %d\n", lista->registros[i].quantidadeProduto);
+        printf("----------------------------------\n");
     }
 }
 
@@ -110,10 +132,11 @@ void menuAcoes(LISTA lista){
                 // Implementar atualização de estoque(mudar algum produto)
                 break;
             case 4:
+            removerproduto(&lista);
                 // Implementar exclusão de produto
                 break;
             case 5:
-                // Implementar listagem de produtos
+                listarProdutos(&lista);
                 break;
             case 6:
                 // Implementar ordenação dos produtos
@@ -136,7 +159,7 @@ int main() {
 
     LISTA lista;
 
-    inicializarFila(&lista);
+    inicializarLista(&lista);
     menuAcoes(lista);
 
     return 0;
