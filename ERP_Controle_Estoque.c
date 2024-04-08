@@ -58,6 +58,17 @@ void buscarProduto(LISTA *lista){
     }
 }
 
+void listarProdutos(LISTA *lista){
+    
+    printf("----------------------------------\n");
+    for(int i = 0; i < lista->qtde; i++){
+        printf("ProdutoID: %d\n", lista->registros[i].idProduto);
+        printf("Nome Produto: %s\n", lista->registros[i].nomeProduto);
+        printf("Quantidade Produto: %d\n", lista->registros[i].quantidadeProduto);
+        printf("----------------------------------\n");
+    }
+}
+
 void menuAcoes(LISTA lista){
     int opcao;
 
@@ -89,7 +100,7 @@ void menuAcoes(LISTA lista){
                 // Implementar exclusão de produto
                 break;
             case 5:
-                // Implementar listagem de produtos
+                listarProdutos(&lista);
                 break;
             case 6:
                 // Implementar ordenação dos produtos
