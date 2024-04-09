@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define TAM 10
 
 typedef struct{
@@ -104,6 +105,23 @@ void salvar_dados(LISTA *lista){
 
 }
 
+void buscar_arquivo(LISTA *lista){
+    FILE *arquivo = fopen("arquivo.txt", "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo para leitura.\n");
+        return;
+    }
+
+    while (lista->qtde < TAM && fscanf(arquivo, "%d", &lista->registros[lista->qtde].idProduto) != EOF) {
+        fscanf(arquivo, "%s", lista->registros[lista->qtde].nomeProduto);
+        fscanf(arquivo, "%d", &lista->registros[lista->qtde].quantidadeProduto);
+        lista->qtde++;
+    }
+
+    fclose(arquivo);
+}
+
+
 void menuAcoes(LISTA lista){
     int opcao;
 
@@ -142,7 +160,7 @@ void menuAcoes(LISTA lista){
                 // Implementar ordenação dos produtos
                 break;
             case 7:
-                // Implementar busca de dados do arquivo de texto
+                buscar_arquivo(&lista);
                 break;
             case 8:
                 salvar_dados(&lista);
