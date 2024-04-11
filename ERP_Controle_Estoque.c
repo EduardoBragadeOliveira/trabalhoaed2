@@ -45,7 +45,7 @@ void inicializarEstoqueEListaCategorias(ESTOQUE *estoque, LISTA_CATEGORIAS *list
     listaCategorias->qtde = 0;
 }
 
-void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS listaCategorias)
+void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS *listaCategorias)
 {
     PRODUTO produto;
     CATEGORIA variados = {0, "Variados", 10};
@@ -72,25 +72,25 @@ void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS listaCategorias)
         printf("Digite o ano validade (somente numeros): ");
         scanf("%d", &produto.dataValidade.ano);
 
-        if(listaCategorias.qtde > 0){
-            printf("Encontramos %d categoria(s)\n", listaCategorias.qtde);
+        if(listaCategorias->qtde > 0){
+            printf("Encontramos %d categoria(s)\n", listaCategorias->qtde);
             printf("1. Listar e escolher categoria\n");
-            printf("2. Criar categoria nova");
+            printf("2. Criar categoria nova\n");
             printf("Escolha uma opcao: ");
             scanf("%d", &opcao);
 
             if(opcao == 1){
-                listarCategorias(&listaCategorias);
+                listarCategorias(listaCategorias);
 
                 do
                 {
-                    posCategoria = buscarCategoria(&listaCategorias, 2);
+                    posCategoria = buscarCategoria(listaCategorias, 2);
                 } while (posCategoria == -1);
             } else if(opcao == 2){
-                posCategoria = inserirCategoria(&listaCategorias);
+                posCategoria = inserirCategoria(listaCategorias);
             }
 
-            produto.categoria = listaCategorias.categorias[posCategoria];
+            produto.categoria = listaCategorias->categorias[posCategoria];
         } else {
             printf("Nao encontramos categorias \n");
             printf("Deseja criar uma categoria? \n");
@@ -100,8 +100,8 @@ void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS listaCategorias)
             scanf("%d", &opcao);
 
             if(opcao == 1){
-                posCategoria = inserirCategoria(&listaCategorias);
-                produto.categoria = listaCategorias.categorias[posCategoria];
+                posCategoria = inserirCategoria(listaCategorias);
+                produto.categoria = listaCategorias->categorias[posCategoria];
             } else if(opcao == 2){
                 produto.categoria = variados;
             }
@@ -115,8 +115,6 @@ void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS listaCategorias)
 
         estoque->qtde++;
         
-        
-
         printf("Produto salvo com o id: %d", produto.idProduto);
     }
 }
@@ -149,7 +147,7 @@ int buscarProduto(ESTOQUE *estoque)
 {
     int id;
 
-    printf("Digite o id do produto a ser pesquisado: ");
+    printf("Digite o id do produto a ser buscado: ");
     scanf("%d", &id);
 
     for (int i = 0; i < estoque->qtde; i++)
@@ -173,7 +171,12 @@ int buscarProduto(ESTOQUE *estoque)
 int buscarCategoria(LISTA_CATEGORIAS *listaCategorias, int tipoBusca){
     int id;
 
-    printf("Digite o id do produto a ser pesquisado: ");
+    if(tipoBusca == 1){
+        printf("Digite o id da categoria a ser buscada: ");
+    } else if (tipoBusca == 2){
+        printf("Digite o id da categoria a ser escolhida: ");
+    }
+    
     scanf("%d", &id);
 
     for (int i = 0; i < listaCategorias->qtde; i++)
@@ -192,7 +195,7 @@ int buscarCategoria(LISTA_CATEGORIAS *listaCategorias, int tipoBusca){
         }
     }
 
-    printf("ID do produto invalido!\n");
+    printf("ID da categoria invalido!\n");
     return -1;
 }
 
@@ -238,7 +241,7 @@ void listarProdutos(ESTOQUE *estoque)
 
 void listarCategorias(LISTA_CATEGORIAS *listaCategorias)
 {
-
+    if(listaCategorias->qtde > 0){
         printf("----------------------------------\n");
         for (int i = 0; i < listaCategorias->qtde; i++)
         {
@@ -247,10 +250,9 @@ void listarCategorias(LISTA_CATEGORIAS *listaCategorias)
             printf("Porcentagem Extra: %.2f%%\n", listaCategorias->categorias[i].margemLucro);
             printf("----------------------------------\n");
         }
-    // if(listaCategorias->qtde > 0){
-    // } else {
-    //     printf("Nao ha categorias criadas!\n");
-    // }
+    } else {
+        printf("Nao ha categorias criadas!\n");
+    }
 }
 
 void salvarTabelaProdutos(ESTOQUE *estoque)
@@ -309,7 +311,7 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
     {
         printf("\n---- Menu ----\n");
         printf("1. Inserir no estoque\n");
-        printf("2. Buscar produto\n");
+        printf("2. Buscar no estoque\n");
         printf("3. Atualizar estoque\n");
         printf("4. Excluir produto\n");
         printf("5. Listar estoque\n");
@@ -329,14 +331,24 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
             scanf("%d", &opcao);
 
             if(opcao == 1){
-                inserirProduto(&estoque, listaCategorias);
+                inserirProduto(&estoque, &listaCategorias);
             } else if(opcao == 2){
                 inserirCategoria(&listaCategorias);
             }
 
             break;
         case 2:
-            buscarProduto(&estoque);
+            printf("1. Buscar produto\n");
+            printf("2. Buscar categoria\n");
+            printf("Escolha uma opcao: ");
+            scanf("%d", &opcao);
+
+            if(opcao == 1){
+                buscarProduto(&estoque);
+            } else if(opcao == 2){
+                buscarCategoria(&listaCategorias, 1);
+            }
+
             break;
         case 3:
             // Implementar atualização de estoque(mudar algum produto)
