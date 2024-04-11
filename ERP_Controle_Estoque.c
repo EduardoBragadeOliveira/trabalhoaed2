@@ -257,10 +257,18 @@ void listarCategorias(LISTA_CATEGORIAS *listaCategorias)
 
 void salvarTabelaProdutos(ESTOQUE *estoque)
 {
-    char *nome_temp[20];
-    int id_temp;
-    int qntd_temp;
-    FILE *arquivo = fopen("arquivo.txt", "w");
+    char *TEMP_nomeProduto[20];
+    int TEMP_idProduto;
+    int TEMP_quantidadeProduto;
+    float TEMP_precoCusto;
+    float TEMP_precoVenda;
+    int TEMP_ano;
+    int TEMP_mes;
+    int TEMP_dia;
+    int TEMP_idCategoria;
+    char *TEMP_nomeCategoria[20];
+
+    FILE *arquivo = fopen("arquivoProdutos.txt", "w");
     if (!arquivo)
     {
         printf("Erro ao abrir arquivo para escrita.\n");
@@ -268,12 +276,51 @@ void salvarTabelaProdutos(ESTOQUE *estoque)
     if (estoque->qtde > 0)
     {
         for (int i = 0; i < estoque->qtde; i++)
-        {
-            *nome_temp = NULL;
-            *nome_temp = estoque->produtos[i].nomeProduto;
-            id_temp = estoque->produtos[i].idProduto;
-            qntd_temp = estoque->produtos[i].quantidadeProduto;
-            fprintf(arquivo, "%05d \n%s \n%03d \n", id_temp, *nome_temp, qntd_temp);
+        {   
+            *TEMP_nomeProduto = NULL;
+            *TEMP_nomeCategoria = NULL;
+            *TEMP_nomeProduto = estoque->produtos[i].nomeProduto;
+            TEMP_idProduto = estoque->produtos[i].idProduto;
+            TEMP_quantidadeProduto = estoque->produtos[i].quantidadeProduto;
+            TEMP_precoCusto = estoque->produtos[i].precoCusto;
+            TEMP_precoVenda = estoque->produtos[i].precoVenda;
+            TEMP_ano = estoque->produtos[i].dataValidade.ano;
+            TEMP_mes = estoque->produtos[i].dataValidade.mes;
+            TEMP_dia = estoque->produtos[i].dataValidade.dia;
+            *TEMP_nomeCategoria = estoque->produtos[i].categoria.nomeCategoria;
+            fprintf(arquivo, "%s%05d \n%03d \n", *TEMP_nomeProduto, TEMP_idProduto, TEMP_quantidadeProduto);
+            fprintf(arquivo, "%.2f \n%.2f \n", TEMP_precoCusto, TEMP_precoVenda);
+            fprintf(arquivo, "%d%d%d \n%s", TEMP_dia, TEMP_mes, TEMP_ano, *TEMP_nomeCategoria);
+        }
+        printf("Relacao salva com sucesso!\n");
+        fclose(arquivo);
+    }
+    else
+    {
+        printf("O estoque esta vazio!\n");
+    }
+}
+
+void salvarTabelaCategorias(LISTA_CATEGORIAS *lista_categorias)
+{
+    char *TEMP_nomeCategoria[20];
+    float TEMP_margemLucro;
+    int TEMP_idCategoria;
+
+    FILE *arquivo = fopen("arquivoCategorias.txt", "w");
+    if (!arquivo)
+    {
+        printf("Erro ao abrir arquivo para escrita.\n");
+    }
+    if (lista_categorias->qtde > 0)
+    {
+        for (int i = 0; i < lista_categorias->qtde; i++)
+        {   
+            *TEMP_nomeCategoria = NULL;
+            *TEMP_nomeCategoria = lista_categorias->categorias[i].nomeCategoria;
+            TEMP_margemLucro = lista_categorias->categorias[i].margemLucro;
+            TEMP_idCategoria = lista_categorias->categorias[i].idCategoria;
+            fprintf(arquivo, "%s%.2f \n%05d \n", *TEMP_nomeCategoria, TEMP_margemLucro, TEMP_idCategoria);  
         }
         printf("Relacao salva com sucesso!\n");
         fclose(arquivo);
@@ -377,6 +424,7 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
             break;
         case 8:
             salvarTabelaProdutos(&estoque);
+            salvarTabelaCategorias(&listaCategorias);
             break;
         case 9:
             printf("Saindo do programa...\n");
