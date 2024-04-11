@@ -487,6 +487,68 @@ void salvarTabelaProdutos(ESTOQUE *estoque)
         printf("O estoque esta vazio!\n");
     }
 }
+void trocar(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+int particao(int vet[], int inicio, int fim){
+    int pivo = vet[(inicio + fim)/2];
+    int a = inicio-1;
+    int b = fim+1;
+
+    while(a<b){
+        do{
+            a++;
+        } while(vet[a] < pivo);
+        do{
+            b--;
+        } while(vet[b] > pivo);
+        if(a<b) trocar(&vet[a], &vet[b]);
+    }
+    return b;
+}
+
+void quickSort(int vet[], int inicio, int fim){
+    if(inicio<fim){
+        int meio = particao(vet,inicio,fim);
+        quickSort(vet,inicio,meio);
+        quickSort(vet,meio+1,fim);
+    }
+}
+
+void ordenarProduto(ESTOQUE *estoque){
+        int mesValidade, diaValidade, anoValidade;
+
+    printf("Ordenando por quantidade . . .\n");
+
+    int quantidades[TAM];
+
+    for (int i = 0; i < estoque->qtde; i++) {
+        quantidades[i] = estoque->produtos[i].quantidadeProduto;
+    }
+    quickSort(quantidades, 0, estoque->qtde - 1);
+    
+    for (int i = 0; i < estoque->qtde; i++){
+        for (int j = 0; j < estoque->qtde; j++) {
+            if (estoque->produtos[j].quantidadeProduto == quantidades[i]) {
+                diaValidade = estoque->produtos[i].dataValidade.dia;
+            mesValidade = estoque->produtos[i].dataValidade.mes;
+            anoValidade = estoque->produtos[i].dataValidade.ano;
+                printf("Nome Produto: %s", estoque->produtos[j].nomeProduto);
+                printf("Quantidade Produto: %d\n", estoque->produtos[j].quantidadeProduto);
+                printf("Produto ID: %d\n", estoque->produtos[j].idProduto);
+                // printf("Preco de custo: R$ %.2f\n", estoque->produtos[j].precoCusto);
+                // printf("Preco de venda: R$ %.2f\n", estoque->produtos[j].precoVenda);
+                // printf("Data de validade: %d/%d/%d\n", diaValidade, mesValidade, anoValidade);
+                printf("Categoria: %s\n", estoque->produtos[j].categoria.nomeCategoria);
+                printf("----------------------------------\n");
+                break;
+            }
+        }
+    }
+}
+
 
 void salvarTabelaCategorias(LISTA_CATEGORIAS *lista_categorias)
 {
@@ -536,6 +598,8 @@ void buscarTabelaProdutos(ESTOQUE *estoque)
 
     fclose(arquivo);
 }
+
+
 
 void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
 {
@@ -637,7 +701,16 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
 
             break;
         case 6:
-            // Implementar ordenação dos produtos
+            do{
+            printf("1. para ordenar por data\n2. para ordenar os produtos: \n");
+            scanf("%d", &opcao);
+                if(opcao == 1){
+                    // ordenarData();
+                }
+                else if(opcao == 2){
+                    ordenarProduto(&estoque);
+                }
+            }while((opcao>2) || (opcao<1));
             break;
         case 7:
             buscarTabelaProdutos(&estoque);
