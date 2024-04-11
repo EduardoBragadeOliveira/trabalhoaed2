@@ -408,7 +408,7 @@ void listarProdutos(ESTOQUE *estoque)
             anoValidade = estoque->produtos[i].dataValidade.ano;
 
             printf("Produto ID: %d\n", estoque->produtos[i].idProduto);
-            printf("Nome Produto: %s", estoque->produtos[i].nomeProduto);
+            printf("Nome Produto: %s\n", estoque->produtos[i].nomeProduto);
             printf("Quantidade Produto: %d\n", estoque->produtos[i].quantidadeProduto);
             printf("Preco de custo: R$ %.2f\n", estoque->produtos[i].precoCusto);
             printf("Preco de venda: R$ %.2f\n", estoque->produtos[i].precoVenda);
@@ -431,7 +431,7 @@ void listarCategorias(LISTA_CATEGORIAS *listaCategorias)
         for (int i = 0; i < listaCategorias->qtde; i++)
         {
             printf("Categoria ID: %d\n", listaCategorias->categorias[i].idCategoria);
-            printf("Nome Categoria: %s", listaCategorias->categorias[i].nomeCategoria);
+            printf("Nome Categoria: %s\n", listaCategorias->categorias[i].nomeCategoria);
             printf("Porcentagem Extra: %.2f%%\n", listaCategorias->categorias[i].margemLucro);
             printf("----------------------------------\n");
         }
@@ -477,7 +477,7 @@ void salvarTabelaProdutos(ESTOQUE *estoque)
             *TEMP_nomeCategoria = estoque->produtos[i].categoria.nomeCategoria;
             fprintf(arquivo, "%s%05d \n%03d \n", *TEMP_nomeProduto, TEMP_idProduto, TEMP_quantidadeProduto);
             fprintf(arquivo, "%.2f \n%.2f \n", TEMP_precoCusto, TEMP_precoVenda);
-            fprintf(arquivo, "%d%d%d \n%s", TEMP_dia, TEMP_mes, TEMP_ano, *TEMP_nomeCategoria);
+            fprintf(arquivo, "%02d\n%02d\n%04d \n%s", TEMP_dia, TEMP_mes, TEMP_ano, *TEMP_nomeCategoria);
         }
         printf("Relacao salva com sucesso!\n");
         fclose(arquivo);
@@ -576,13 +576,13 @@ void salvarTabelaCategorias(LISTA_CATEGORIAS *lista_categorias)
     }
     else
     {
-        printf("O estoque esta vazio!\n");
+        printf("Nao ha categorias cadastradas!\n");
     }
 }
 
 void buscarTabelaProdutos(ESTOQUE *estoque)
 {
-    FILE *arquivo = fopen("arquivo.txt", "r");
+    FILE *arquivo = fopen("arquivoProdutos.txt", "r");
     if (!arquivo)
     {
         printf("Erro ao abrir o arquivo da relacao de estoque.\n");
@@ -592,12 +592,44 @@ void buscarTabelaProdutos(ESTOQUE *estoque)
     while (estoque->qtde < TAM && fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].idProduto) != EOF)
     {
         fscanf(arquivo, "%s", estoque->produtos[estoque->qtde].nomeProduto);
+        fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].idProduto);
         fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].quantidadeProduto);
+        fscanf(arquivo, "%f", &estoque->produtos[estoque->qtde].precoCusto);
+        fscanf(arquivo, "%f", &estoque->produtos[estoque->qtde].precoVenda);
+        fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].dataValidade.dia);
+        fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].dataValidade.mes);
+        fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].dataValidade.ano);
+        fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].categoria.idCategoria);
+        fscanf(arquivo, "%s", &estoque->produtos[estoque->qtde].categoria.nomeCategoria);
+
         estoque->qtde++;
     }
 
     fclose(arquivo);
 }
+
+void buscarTabelaCategorias(LISTA_CATEGORIAS *categorias)
+{
+    FILE *arquivo = fopen("arquivoCategorias.txt", "r");
+    if (!arquivo)
+    {
+        printf("Erro ao abrir o arquivo da relacao de estoque.\n");
+        return;
+    }
+
+    while (categorias->qtde < TAM && fscanf(arquivo, "%d", &categorias->categorias[categorias->qtde].idCategoria) != EOF)
+    {
+        fscanf(arquivo, "%s", categorias->categorias[categorias->qtde].nomeCategoria);
+        fscanf(arquivo, "%f", &categorias->categorias[categorias->qtde].margemLucro);
+        fscanf(arquivo, "%d", &categorias->categorias[categorias->qtde].idCategoria);
+        
+
+        categorias->qtde++;
+    }
+
+    fclose(arquivo);
+}
+
 
 
 
@@ -713,6 +745,8 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
             }while((opcao>2) || (opcao<1));
             break;
         case 7:
+            printf("Buscando dados...\n");
+            buscarTabelaCategorias(&listaCategorias);
             buscarTabelaProdutos(&estoque);
             break;
         case 8:
