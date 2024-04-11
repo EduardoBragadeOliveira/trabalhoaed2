@@ -95,7 +95,7 @@ void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS *listaCategorias)
             printf("Nao encontramos categorias \n");
             printf("Deseja criar uma categoria? \n");
             printf("1. Sim\n");
-            printf("2. Nao, quero deixar em variados\n");
+            printf("2. Nao, quero deixar sem categoria\n");
             printf("Escolha uma opcao: ");
             scanf("%d", &opcao);
 
