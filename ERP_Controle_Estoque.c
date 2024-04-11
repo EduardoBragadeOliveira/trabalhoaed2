@@ -452,6 +452,198 @@ void listarCategorias(LISTA_CATEGORIAS *listaCategorias)
     }
 }
 
+void trocar(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int particao(int vet[], int inicio, int fim, int ordenacao){
+    int pivo = vet[(inicio + fim)/2];
+    int a = inicio-1;
+    int b = fim+1;
+
+    if(ordenacao == 1){ //crescente
+        while(a<b){
+            do{
+                a++;
+            } while(vet[a] < pivo);
+            do{
+                b--;
+            } while(vet[b] > pivo);
+            if(a<b) trocar(&vet[a], &vet[b]);
+        }
+    }
+    else if(ordenacao == 2){ //descrescente
+        while(a<b){
+            do{
+                a++;
+            } while(vet[a] > pivo); 
+            do{
+                b--;
+            } while(vet[b] < pivo); 
+            if(a<b) trocar(&vet[a], &vet[b]);
+        }
+    }
+    return b;
+}
+
+    void quickSort(int vet[], int inicio, int fim, int ordenacao){
+        if(inicio<fim){
+            int meio = particao(vet,inicio,fim, ordenacao);
+            quickSort(vet,inicio,meio, ordenacao);
+            quickSort(vet,meio+1,fim, ordenacao);
+        }
+    }
+
+    void ordenarProdutoQtde(ESTOQUE *estoque){
+        int op;
+        printf("entre com:\n(1) para ordenar crescente\n(2) para ordenar decrescente\n");
+        scanf("%d", &op);
+
+        if(op == 1){
+            printf("Ordenando quantidade de forma crescente . . .\n");
+
+            int quantidades[TAM_ESTOQUE];
+
+            for (int i = 0; i < estoque->qtde; i++) {
+                quantidades[i] = estoque->produtos[i].quantidadeProduto;
+            }
+            quickSort(quantidades, 0, estoque->qtde - 1, op);
+        
+            for (int i = 0; i < estoque->qtde; i++){
+                for (int j = 0; j < estoque->qtde; j++) {
+                    if (estoque->produtos[j].quantidadeProduto == quantidades[i]) {
+                        printf("Nome Produto: %s\n", estoque->produtos[j].nomeProduto);
+                        printf("Quantidade Produto: %d\n", estoque->produtos[j].quantidadeProduto);
+                        printf("Produto ID: %d\n", estoque->produtos[j].idProduto);
+                        printf("Categoria: %s\n", estoque->produtos[j].categoria.nomeCategoria);
+                        printf("----------------------------------\n");
+                        break;
+                    }
+                }
+            }
+        }
+        else if(op==2){
+            printf("Ordenando quantidade de forma decrescente . . .\n");
+            
+            int quantidades[TAM_ESTOQUE];
+
+            for (int i = 0; i < estoque->qtde; i++) {
+                quantidades[i] = estoque->produtos[i].quantidadeProduto;
+            }
+            quickSort(quantidades, 0, estoque->qtde - 1, op);
+        
+            for (int i = 0; i < estoque->qtde; i++){
+                for (int j = 0; j < estoque->qtde; j++) {
+                    if (estoque->produtos[j].quantidadeProduto == quantidades[i]) {
+                        printf("Nome Produto: %s\n", estoque->produtos[j].nomeProduto);
+                        printf("Quantidade Produto: %d\n", estoque->produtos[j].quantidadeProduto);
+                        printf("Produto ID: %d\n", estoque->produtos[j].idProduto);
+                        printf("Categoria: %s\n", estoque->produtos[j].categoria.nomeCategoria);
+                        printf("----------------------------------\n");
+                        break;
+                    }
+                }
+            }   
+        }
+    }
+
+    void trocarFloat(float *a, float *b) {
+    float temp = *a;
+    *a = *b;
+    *b = temp;
+    }
+
+    float particaoFloat(float vet[], int inicio, int fim, int ordenacao) {
+        float pivo = vet[(inicio + fim) / 2];
+        int a = inicio - 1;
+        int b = fim + 1;
+
+        if (ordenacao == 1) { // crescente
+            while (a < b) {
+                do {
+                    a++;
+                } while (vet[a] < pivo);
+                do {
+                    b--;
+                } while (vet[b] > pivo);
+                if (a < b) trocarFloat(&vet[a], &vet[b]);
+            }
+        } else if (ordenacao == 2) { // decrescente
+            while (a < b) {
+                do {
+                    a++;
+                } while (vet[a] > pivo);
+                do {
+                    b--;
+                } while (vet[b] < pivo);
+                if (a < b) trocarFloat(&vet[a], &vet[b]);
+            }
+        }
+        return b;
+    }
+
+    void quickSortFloat(float vet[], int inicio, int fim, int ordenacao) {
+    if (inicio < fim) {
+        int meio = particaoFloat(vet, inicio, fim, ordenacao);
+        quickSortFloat(vet, inicio, meio, ordenacao);
+        quickSortFloat(vet, meio + 1, fim, ordenacao);
+    }
+}
+
+void ordenarPrecoVenda(ESTOQUE *estoque){
+    int op;
+    float precos[TAM_ESTOQUE];
+    printf("entre com:\n(1) para ordenar crescente\n(2) para ordenar decrescente\n");
+    scanf("%d", &op);
+
+    if (op == 1){
+        printf("Ordenando preco de venda de forma crescente . . .\n");
+
+        for (int i = 0; i < estoque->qtde; i++) {
+            precos[i] = estoque->produtos[i].precoVenda;
+        }
+        quickSortFloat(precos, 0, estoque->qtde - 1, op);
+    
+        for (int i = 0; i < estoque->qtde; i++){
+            for (int j = 0; j < estoque->qtde; j++) {
+                if (estoque->produtos[j].precoVenda == precos[i]) {
+                    printf("Nome Produto: %s\n", estoque->produtos[j].nomeProduto);
+                    printf("Preco de venda: R$ %.2f\n", estoque->produtos[j].precoVenda); 
+                    printf("Preco de custo: R$ %.2f\n", estoque->produtos[j].precoCusto); 
+                    printf("Produto ID: %d\n", estoque->produtos[j].idProduto); 
+                    printf("Categoria: %s\n", estoque->produtos[j].categoria.nomeCategoria); 
+                    printf("----------------------------------\n");
+                    break;
+                }
+            }
+        }
+    }
+    else if(op==2){
+        printf("Ordenando preco de venda de forma decrescente . . .\n");
+        
+        for (int i = 0; i < estoque->qtde; i++) {
+            precos[i] = estoque->produtos[i].precoVenda;
+        }
+        quickSortFloat(precos, 0, estoque->qtde - 1, op);
+    
+        for (int i = 0; i < estoque->qtde; i++){
+            for (int j = 0; j < estoque->qtde; j++) {
+                if (estoque->produtos[j].precoVenda == precos[i]) {
+                    printf("Nome Produto: %s\n", estoque->produtos[j].nomeProduto); 
+                    printf("Preco de venda: R$ %.2f\n", estoque->produtos[j].precoVenda);
+                    printf("Preco de custo: R$ %.2f\n", estoque->produtos[j].precoCusto); 
+                    printf("Produto ID: %d\n", estoque->produtos[j].idProduto); 
+                    printf("Categoria: %s\n", estoque->produtos[j].categoria.nomeCategoria);
+                    printf("----------------------------------\n");
+                    break;
+                }
+            }
+        }   
+    }
+}
+
 void salvarTabelaProdutos(ESTOQUE *estoque)
 {
     char *TEMP_nomeProduto[20];
@@ -497,69 +689,7 @@ void salvarTabelaProdutos(ESTOQUE *estoque)
         printf("O estoque esta vazio!\n");
     }
 }
-void trocar(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-int particao(int vet[], int inicio, int fim){
-    int pivo = vet[(inicio + fim)/2];
-    int a = inicio-1;
-    int b = fim+1;
-
-    while(a<b){
-        do{
-            a++;
-        } while(vet[a] < pivo);
-        do{
-            b--;
-        } while(vet[b] > pivo);
-        if(a<b) trocar(&vet[a], &vet[b]);
-    }
-    return b;
-}
-
-void quickSort(int vet[], int inicio, int fim){
-    if(inicio<fim){
-        int meio = particao(vet,inicio,fim);
-        quickSort(vet,inicio,meio);
-        quickSort(vet,meio+1,fim);
-    }
-}
-
-void ordenarProduto(ESTOQUE *estoque){
-        int mesValidade, diaValidade, anoValidade;
-
-    printf("Ordenando por quantidade . . .\n");
-
-    int quantidades[TAM_ESTOQUE];
-
-    for (int i = 0; i < estoque->qtde; i++) {
-        quantidades[i] = estoque->produtos[i].quantidadeProduto;
-    }
-    quickSort(quantidades, 0, estoque->qtde - 1);
-    
-    for (int i = 0; i < estoque->qtde; i++){
-        for (int j = 0; j < estoque->qtde; j++) {
-            if (estoque->produtos[j].quantidadeProduto == quantidades[i]) {
-                diaValidade = estoque->produtos[i].dataValidade.dia;
-            mesValidade = estoque->produtos[i].dataValidade.mes;
-            anoValidade = estoque->produtos[i].dataValidade.ano;
-                printf("Nome Produto: %s", estoque->produtos[j].nomeProduto);
-                printf("Quantidade Produto: %d\n", estoque->produtos[j].quantidadeProduto);
-                printf("Produto ID: %d\n", estoque->produtos[j].idProduto);
-                // printf("Preco de custo: R$ %.2f\n", estoque->produtos[j].precoCusto);
-                // printf("Preco de venda: R$ %.2f\n", estoque->produtos[j].precoVenda);
-                // printf("Data de validade: %d/%d/%d\n", diaValidade, mesValidade, anoValidade);
-                printf("Categoria: %s\n", estoque->produtos[j].categoria.nomeCategoria);
-                printf("----------------------------------\n");
-                break;
-            }
-        }
-    }
-}
-
-
+ 
 void salvarTabelaCategorias(LISTA_CATEGORIAS *lista_categorias)
 {
     char *TEMP_nomeCategoria[20];
@@ -639,9 +769,6 @@ void buscarTabelaCategorias(LISTA_CATEGORIAS *categorias)
 
     fclose(arquivo);
 }
-
-
-
 
 void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
 {
@@ -743,16 +870,16 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
 
             break;
         case 6:
-            do{
-            printf("1. para ordenar por data\n2. para ordenar os produtos: \n");
-            scanf("%d", &opcao);
-                if(opcao == 1){
-                    // ordenarData();
-                }
-                else if(opcao == 2){
-                    ordenarProduto(&estoque);
-                }
-            }while((opcao>2) || (opcao<1));
+           do{
+                printf("1. para ordenar por preco de venda\n2. para ordenar por quantidade \n");
+                scanf("%d", &opcao);
+                    if(opcao == 1){
+                        ordenarPrecoVenda(&estoque);
+                    }
+                    else if(opcao == 2){
+                        ordenarProdutoQtde(&estoque);
+                    }
+                }while((opcao>2) || (opcao<1));
             break;
         case 7:
             printf("Buscando dados...\n");
