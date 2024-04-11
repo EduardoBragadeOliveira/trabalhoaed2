@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define TAM 10
+#define TAM_ESTOQUE 1000
+#define TAM_CATEGORIA 100
+
+
 
 typedef struct
 {
@@ -19,7 +22,7 @@ typedef struct
 
 typedef struct
 {
-    CATEGORIA categorias[TAM];
+    CATEGORIA categorias[TAM_CATEGORIA];
     int qtde;
 } LISTA_CATEGORIAS;
 
@@ -36,9 +39,14 @@ typedef struct
 
 typedef struct
 {
-    PRODUTO produtos[TAM];
+    PRODUTO produtos[TAM_ESTOQUE];
     int qtde;
 } ESTOQUE;
+
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
 void inicializarEstoqueEListaCategorias(ESTOQUE *estoque, LISTA_CATEGORIAS *listaCategorias)
 {
@@ -49,14 +57,15 @@ void inicializarEstoqueEListaCategorias(ESTOQUE *estoque, LISTA_CATEGORIAS *list
 void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS *listaCategorias)
 {
     PRODUTO produto;
-    CATEGORIA categoriaPadrao = {0, "Sem Categoria", 0};
+    CATEGORIA categoriaPadrao = {0, "Sem_Categoria", 0};
     int posCategoria, opcao;
 
-    if (estoque->qtde < TAM)
+    if (estoque->qtde < TAM_ESTOQUE)
     {
-        getchar();
+        fflush(stdin);
         printf("Digite o nome do produto: ");
-        fgets(produto.nomeProduto, sizeof(produto.nomeProduto), stdin);
+        fflush(stdin);
+        scanf("%s", produto.nomeProduto);
 
         printf("Digite a quantidade do produto: ");
         scanf("%d", &produto.quantidadeProduto);
@@ -133,11 +142,12 @@ int inserirCategoria(LISTA_CATEGORIAS *listaCategorias)
 {
     CATEGORIA categoria;
 
-    if (listaCategorias->qtde < TAM)
+    if (listaCategorias->qtde < TAM_CATEGORIA)
     {
-        getchar();
+        fflush(stdin);
         printf("Digite o nome da categoria: ");
-        fgets(categoria.nomeCategoria, sizeof(categoria.nomeCategoria), stdin);
+        fflush(stdin);
+        scanf("%s", categoria.nomeCategoria);
 
         printf("Digite a margem de lucro na categoria: ");
         scanf("%f", &categoria.margemLucro);
@@ -475,9 +485,9 @@ void salvarTabelaProdutos(ESTOQUE *estoque)
             TEMP_mes = estoque->produtos[i].dataValidade.mes;
             TEMP_dia = estoque->produtos[i].dataValidade.dia;
             *TEMP_nomeCategoria = estoque->produtos[i].categoria.nomeCategoria;
-            fprintf(arquivo, "%s%05d \n%03d \n", *TEMP_nomeProduto, TEMP_idProduto, TEMP_quantidadeProduto);
+            fprintf(arquivo, "%s\n%05d \n%03d \n", *TEMP_nomeProduto, TEMP_idProduto, TEMP_quantidadeProduto);
             fprintf(arquivo, "%.2f \n%.2f \n", TEMP_precoCusto, TEMP_precoVenda);
-            fprintf(arquivo, "%02d\n%02d\n%04d \n%s", TEMP_dia, TEMP_mes, TEMP_ano, *TEMP_nomeCategoria);
+            fprintf(arquivo, "%02d\n%02d\n%04d \n%s\n", TEMP_dia, TEMP_mes, TEMP_ano, *TEMP_nomeCategoria);
         }
         printf("Relacao salva com sucesso!\n");
         fclose(arquivo);
@@ -522,7 +532,7 @@ void ordenarProduto(ESTOQUE *estoque){
 
     printf("Ordenando por quantidade . . .\n");
 
-    int quantidades[TAM];
+    int quantidades[TAM_ESTOQUE];
 
     for (int i = 0; i < estoque->qtde; i++) {
         quantidades[i] = estoque->produtos[i].quantidadeProduto;
@@ -569,7 +579,7 @@ void salvarTabelaCategorias(LISTA_CATEGORIAS *lista_categorias)
             *TEMP_nomeCategoria = lista_categorias->categorias[i].nomeCategoria;
             TEMP_margemLucro = lista_categorias->categorias[i].margemLucro;
             TEMP_idCategoria = lista_categorias->categorias[i].idCategoria;
-            fprintf(arquivo, "%s%.2f \n%05d \n", *TEMP_nomeCategoria, TEMP_margemLucro, TEMP_idCategoria);  
+            fprintf(arquivo, "%s\n%.2f \n%05d \n", *TEMP_nomeCategoria, TEMP_margemLucro, TEMP_idCategoria);  
         }
         printf("Relacao salva com sucesso!\n");
         fclose(arquivo);
@@ -589,7 +599,7 @@ void buscarTabelaProdutos(ESTOQUE *estoque)
         return;
     }
 
-    while (estoque->qtde < TAM && fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].idProduto) != EOF)
+    while (estoque->qtde < TAM_ESTOQUE && fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].idProduto) != EOF)
     {
         fscanf(arquivo, "%s", estoque->produtos[estoque->qtde].nomeProduto);
         fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].idProduto);
@@ -617,7 +627,7 @@ void buscarTabelaCategorias(LISTA_CATEGORIAS *categorias)
         return;
     }
 
-    while (categorias->qtde < TAM && fscanf(arquivo, "%d", &categorias->categorias[categorias->qtde].idCategoria) != EOF)
+    while (categorias->qtde < TAM_ESTOQUE && fscanf(arquivo, "%d", &categorias->categorias[categorias->qtde].idCategoria) != EOF)
     {
         fscanf(arquivo, "%s", categorias->categorias[categorias->qtde].nomeCategoria);
         fscanf(arquivo, "%f", &categorias->categorias[categorias->qtde].margemLucro);
@@ -639,16 +649,16 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
 
     do
     {
-        printf("\n---- Menu ----\n");
-        printf("1. Inserir no estoque\n");
-        printf("2. Buscar no estoque\n");
-        printf("3. Atualizar estoque\n");
-        printf("4. Remover estoque\n");
-        printf("5. Listar estoque\n");
-        printf("6. Ordenar estoque\n");
-        printf("7. Buscar estoque\n");
-        printf("8. Salvar estoque\n");
-        printf("9. Sair\n");
+        printf("\n============================== Menu ==============================\n");
+        printf("1. ========================== Inserir no estoque\n");
+        printf("2. =========================== Buscar no estoque\n");
+        printf("3. =========================== Atualizar estoque\n");
+        printf("4. ============================= Remover estoque\n");
+        printf("5. ============================== Listar estoque\n");
+        printf("6. ============================= Ordenar estoque\n");
+        printf("7. ============================== Buscar estoque\n");
+        printf("8. ============================== Salvar estoque\n");
+        printf("9. ======================================== Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
@@ -748,12 +758,15 @@ void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
             printf("Buscando dados...\n");
             buscarTabelaCategorias(&listaCategorias);
             buscarTabelaProdutos(&estoque);
-            break;
         case 8:
+            printf("Salvando dados...\n");
             salvarTabelaProdutos(&estoque);
             salvarTabelaCategorias(&listaCategorias);
             break;
         case 9:
+            printf("Fazendo Backup...\n");
+            salvarTabelaProdutos(&estoque);
+            salvarTabelaCategorias(&listaCategorias);
             printf("Saindo do programa...\n");
             break;
         default:
@@ -767,8 +780,14 @@ int main()
 {
     ESTOQUE estoque;
     LISTA_CATEGORIAS listaCategorias;
+    printf("\n");
+    printf("------------------------------------\n");
+    printf("Buscando Banco de Dados!\n");
+    printf("------------------------------------\n");
 
     inicializarEstoqueEListaCategorias(&estoque, &listaCategorias);
+    buscarTabelaCategorias(&listaCategorias);
+    buscarTabelaProdutos(&estoque);
     menuAcoes(estoque, listaCategorias);
 
     return 0;
