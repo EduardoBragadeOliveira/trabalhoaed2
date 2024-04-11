@@ -48,7 +48,7 @@ void inicializarEstoqueEListaCategorias(ESTOQUE *estoque, LISTA_CATEGORIAS *list
 void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS *listaCategorias)
 {
     PRODUTO produto;
-    CATEGORIA variados = {0, "Variados", 10};
+    CATEGORIA variados = {0, "Sem Categoria", 0};
     int posCategoria, opcao;
     
     if (estoque->qtde < TAM)
