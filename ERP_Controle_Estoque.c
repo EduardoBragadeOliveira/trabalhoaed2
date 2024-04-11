@@ -3,61 +3,165 @@
 #include <string.h>
 #define TAM 10
 
+typedef struct {
+    int ano;
+    int mes;
+    int dia;
+} DATA;
+
+typedef struct
+{
+    int idCategoria;
+    char nomeCategoria[20];
+    float margemLucro;
+} CATEGORIA;
+
+typedef struct
+{
+    CATEGORIA categorias[TAM];
+    int qtde;
+} LISTA_CATEGORIAS;
+
 typedef struct
 {
     char nomeProduto[20];
     int idProduto;
     int quantidadeProduto;
-} REGISTRO;
+    float precoCusto;
+    float precoVenda;
+    DATA dataValidade;
+    CATEGORIA categoria;
+} PRODUTO;
 
 typedef struct
 {
-    REGISTRO registros[TAM];
+    PRODUTO produtos[TAM];
     int qtde;
-} LISTA;
+} ESTOQUE;
 
-void inicializarLista(LISTA *lista)
+void inicializarEstoqueEListaCategorias(ESTOQUE *estoque, LISTA_CATEGORIAS *listaCategorias)
 {
-    lista->qtde = 0;
+    estoque->qtde = 0;
+    listaCategorias->qtde = 0;
 }
 
-void inserirProduto(LISTA *lista)
+void inserirProduto(ESTOQUE *estoque, LISTA_CATEGORIAS listaCategorias)
 {
-    REGISTRO r;
-
-    if (lista->qtde < TAM)
+    PRODUTO produto;
+    CATEGORIA variados = {0, "Variados", 10};
+    int posCategoria, opcao;
+    
+    if (estoque->qtde < TAM)
     {
+        getchar();
         printf("Digite o nome do produto: ");
-        scanf("%s", &r.nomeProduto);
+        fgets(produto.nomeProduto, sizeof(produto.nomeProduto), stdin);
 
         printf("Digite a quantidade do produto: ");
-        scanf("%d", &r.quantidadeProduto);
+        scanf("%d", &produto.quantidadeProduto);
 
-        r.idProduto = lista->qtde + 1;
+        printf("Digite o preco de custo: R$ ");
+        scanf("%f", &produto.precoCusto);
 
-        lista->registros[lista->qtde] = r;
+        printf("Digite o dia validade (somente numeros): ");
+        scanf("%d", &produto.dataValidade.dia);
 
-        lista->qtde++;
+        printf("Digite o mes validade (somente numeros): ");
+        scanf("%d", &produto.dataValidade.mes);
 
-        printf("Produto salvo com o id: %d", r.idProduto);
+        printf("Digite o ano validade (somente numeros): ");
+        scanf("%d", &produto.dataValidade.ano);
+
+        if(listaCategorias.qtde > 0){
+            printf("Encontramos %d categoria(s)\n", listaCategorias.qtde);
+            printf("1. Listar e escolher categoria\n");
+            printf("2. Criar categoria nova");
+            printf("Escolha uma opcao: ");
+            scanf("%d", &opcao);
+
+            if(opcao == 1){
+                listarCategorias(&listaCategorias);
+
+                do
+                {
+                    posCategoria = buscarCategoria(&listaCategorias, 2);
+                } while (posCategoria == -1);
+            } else if(opcao == 2){
+                posCategoria = inserirCategoria(&listaCategorias);
+            }
+
+            produto.categoria = listaCategorias.categorias[posCategoria];
+        } else {
+            printf("Nao encontramos categorias \n");
+            printf("Deseja criar uma categoria? \n");
+            printf("1. Sim\n");
+            printf("2. Nao, quero deixar em variados\n");
+            printf("Escolha uma opcao: ");
+            scanf("%d", &opcao);
+
+            if(opcao == 1){
+                posCategoria = inserirCategoria(&listaCategorias);
+                produto.categoria = listaCategorias.categorias[posCategoria];
+            } else if(opcao == 2){
+                produto.categoria = variados;
+            }
+        }
+
+        produto.precoVenda = produto.precoCusto + (produto.precoCusto * (produto.categoria.margemLucro / 100));
+
+        produto.idProduto = estoque->qtde + 1;
+
+        estoque->produtos[estoque->qtde] = produto;
+
+        estoque->qtde++;
+        
+        
+
+        printf("Produto salvo com o id: %d", produto.idProduto);
     }
 }
 
-int buscarProduto(LISTA *lista)
+int inserirCategoria(LISTA_CATEGORIAS *listaCategorias){
+    CATEGORIA categoria;
+
+    if (listaCategorias->qtde < TAM)
+    {
+        getchar();
+        printf("Digite o nome da categoria: ");
+        fgets(categoria.nomeCategoria, sizeof(categoria.nomeCategoria), stdin);
+
+        printf("Digite a margem de lucro na categoria: ");
+        scanf("%f", &categoria.margemLucro);
+
+        categoria.idCategoria = listaCategorias->qtde + 1;
+
+        listaCategorias->categorias[listaCategorias->qtde] = categoria;
+
+        listaCategorias->qtde++;
+
+        printf("Categoria salva com o id: %d\n", categoria.idCategoria);
+
+        return listaCategorias->qtde - 1;
+    }
+}
+
+int buscarProduto(ESTOQUE *estoque)
 {
     int id;
 
     printf("Digite o id do produto a ser pesquisado: ");
     scanf("%d", &id);
 
-    for (int i = 0; i < lista->qtde; i++)
+    for (int i = 0; i < estoque->qtde; i++)
     {
-        if (lista->registros[i].idProduto == id)
+        if (estoque->produtos[i].idProduto == id)
         {
             printf("Produto encontrado!\n");
-            printf("Nome do produto: %s\n", lista->registros[i].nomeProduto);
-            printf("Quantidade: %d\n", lista->registros[i].quantidadeProduto);
-            printf("ID do produto: %d\n", lista->registros[i].idProduto);
+            printf("----------------------------------\n");
+            printf("Nome do produto: %s", estoque->produtos[i].nomeProduto);
+            printf("Quantidade: %d\n", estoque->produtos[i].quantidadeProduto);
+            printf("ID do produto: %d\n", estoque->produtos[i].idProduto);
+            printf("----------------------------------\n");
             return i;
         }
     }
@@ -65,34 +169,91 @@ int buscarProduto(LISTA *lista)
     printf("ID do produto invalido!\n");
     return -1;
 }
-void removerproduto(LISTA *lista)
+
+int buscarCategoria(LISTA_CATEGORIAS *listaCategorias, int tipoBusca){
+    int id;
+
+    printf("Digite o id do produto a ser pesquisado: ");
+    scanf("%d", &id);
+
+    for (int i = 0; i < listaCategorias->qtde; i++)
+    {
+        if (listaCategorias->categorias[i].idCategoria == id)
+        {
+            if(tipoBusca == 1){
+                printf("Categoria encontrada encontrado!\n");
+                printf("----------------------------------\n");
+                printf("Categoria ID: %d\n", listaCategorias->categorias[i].idCategoria);
+                printf("Nome Categoria: %s", listaCategorias->categorias[i].nomeCategoria);
+                printf("Porcentagem Extra: %.2f%%\n", listaCategorias->categorias[i].margemLucro);
+                printf("----------------------------------\n");
+            }
+            return i;
+        }
+    }
+
+    printf("ID do produto invalido!\n");
+    return -1;
+}
+
+void removerProduto(ESTOQUE *estoque)
 {
-    int pos = buscarProduto(lista);
+    int pos = buscarProduto(estoque);
     if (pos >= 0)
     {
-        for (int i = pos; i < lista->qtde - 1; i++)
+        for (int i = pos; i < estoque->qtde - 1; i++)
         {
-            lista->registros[i] = lista->registros[i + 1];
+            estoque->produtos[i] = estoque->produtos[i + 1];
         }
         printf("item  removido!");
-        lista->qtde--;
+        estoque->qtde--;
     }
 }
 
-void listarProdutos(LISTA *lista)
+void listarProdutos(ESTOQUE *estoque)
+{
+    int mesValidade, diaValidade, anoValidade;
+
+    if(estoque->qtde > 0){
+        printf("----------------------------------\n");
+        for (int i = 0; i < estoque->qtde; i++)
+        {
+            diaValidade = estoque->produtos[i].dataValidade.dia;
+            mesValidade = estoque->produtos[i].dataValidade.mes;
+            anoValidade = estoque->produtos[i].dataValidade.ano;
+
+            printf("Produto ID: %d\n", estoque->produtos[i].idProduto);
+            printf("Nome Produto: %s", estoque->produtos[i].nomeProduto);
+            printf("Quantidade Produto: %d\n", estoque->produtos[i].quantidadeProduto);
+            printf("Preco de custo: R$ %.2f\n", estoque->produtos[i].precoCusto);
+            printf("Preco de venda: R$ %.2f\n", estoque->produtos[i].precoVenda);
+            printf("Data de validade: %d/%d/%d\n", diaValidade, mesValidade, anoValidade);
+            printf("Categoria: %s\n", estoque->produtos[i].categoria.nomeCategoria);
+            printf("----------------------------------\n");
+        }
+    } else {
+        printf("Nao ha produtos no estoque!\n");
+    }
+}
+
+void listarCategorias(LISTA_CATEGORIAS *listaCategorias)
 {
 
-    printf("----------------------------------\n");
-    for (int i = 0; i < lista->qtde; i++)
-    {
-        printf("ProdutoID: %d\n", lista->registros[i].idProduto);
-        printf("Nome Produto: %s\n", lista->registros[i].nomeProduto);
-        printf("Quantidade Produto: %d\n", lista->registros[i].quantidadeProduto);
         printf("----------------------------------\n");
-    }
+        for (int i = 0; i < listaCategorias->qtde; i++)
+        {
+            printf("Categoria ID: %d\n", listaCategorias->categorias[i].idCategoria);
+            printf("Nome Categoria: %s", listaCategorias->categorias[i].nomeCategoria);
+            printf("Porcentagem Extra: %.2f%%\n", listaCategorias->categorias[i].margemLucro);
+            printf("----------------------------------\n");
+        }
+    // if(listaCategorias->qtde > 0){
+    // } else {
+    //     printf("Nao ha categorias criadas!\n");
+    // }
 }
 
-void salvar_dados(LISTA *lista)
+void salvarTabelaProdutos(ESTOQUE *estoque)
 {
     char *nome_temp[20];
     int id_temp;
@@ -102,105 +263,126 @@ void salvar_dados(LISTA *lista)
     {
         printf("Erro ao abrir arquivo para escrita.\n");
     }
-    if (lista->qtde > 0)
+    if (estoque->qtde > 0)
     {
-        for (int i = 0; i < lista->qtde; i++)
+        for (int i = 0; i < estoque->qtde; i++)
         {
             *nome_temp = NULL;
-            *nome_temp = lista->registros[i].nomeProduto;
-            id_temp = lista->registros[i].idProduto;
-            qntd_temp = lista->registros[i].quantidadeProduto;
+            *nome_temp = estoque->produtos[i].nomeProduto;
+            id_temp = estoque->produtos[i].idProduto;
+            qntd_temp = estoque->produtos[i].quantidadeProduto;
             fprintf(arquivo, "%05d \n%s \n%03d \n", id_temp, *nome_temp, qntd_temp);
-            printf("%d salvo com sucesso\n");
         }
+        printf("Relacao salva com sucesso!\n");
         fclose(arquivo);
     }
     else
     {
-        printf("A lista esta vazia!\n");
+        printf("O estoque esta vazio!\n");
     }
 }
 
-void buscar_arquivo(LISTA *lista)
+void buscarTabelaProdutos(ESTOQUE *estoque)
 {
     FILE *arquivo = fopen("arquivo.txt", "r");
     if (!arquivo)
     {
-        printf("Erro ao abrir o arquivo para leitura.\n");
+        printf("Erro ao abrir o arquivo da relacao de estoque.\n");
         return;
     }
 
-    while (lista->qtde < TAM && fscanf(arquivo, "%d", &lista->registros[lista->qtde].idProduto) != EOF)
+    while (estoque->qtde < TAM && fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].idProduto) != EOF)
     {
-        fscanf(arquivo, "%s", lista->registros[lista->qtde].nomeProduto);
-        fscanf(arquivo, "%d", &lista->registros[lista->qtde].quantidadeProduto);
-        lista->qtde++;
+        fscanf(arquivo, "%s", estoque->produtos[estoque->qtde].nomeProduto);
+        fscanf(arquivo, "%d", &estoque->produtos[estoque->qtde].quantidadeProduto);
+        estoque->qtde++;
     }
 
     fclose(arquivo);
 }
 
-void menuAcoes(LISTA lista)
+void menuAcoes(ESTOQUE estoque, LISTA_CATEGORIAS listaCategorias)
 {
     int opcao;
 
     do
     {
         printf("\n---- Menu ----\n");
-        printf("1. Inserir produto\n");
+        printf("1. Inserir no estoque\n");
         printf("2. Buscar produto\n");
         printf("3. Atualizar estoque\n");
         printf("4. Excluir produto\n");
         printf("5. Listar estoque\n");
         printf("6. Ordenar estoque\n");
-        printf("7. buscar dados\n");
-        printf("8. Salvar dados\n");
+        printf("7. Buscar estoque\n");
+        printf("8. Salvar estoque\n");
         printf("9. Sair\n");
-        printf("escolha uma opcao: ");
+        printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
         switch (opcao)
         {
         case 1:
-            inserirProduto(&lista);
+            printf("1. Inserir produto\n");
+            printf("2. Inserir categoria\n");
+            printf("Escolha uma opcao: ");
+            scanf("%d", &opcao);
+
+            if(opcao == 1){
+                inserirProduto(&estoque, listaCategorias);
+            } else if(opcao == 2){
+                inserirCategoria(&listaCategorias);
+            }
+
             break;
         case 2:
-            buscarProduto(&lista);
+            buscarProduto(&estoque);
             break;
         case 3:
             // Implementar atualização de estoque(mudar algum produto)
             break;
         case 4:
-            removerproduto(&lista);
-            // Implementar exclusão de produto
+            removerProduto(&estoque);
             break;
         case 5:
-            listarProdutos(&lista);
+            printf("1. Listar produtos\n");
+            printf("2. Listar categorias\n");
+            printf("Escolha uma opcao: ");
+            scanf("%d", &opcao);
+
+            if(opcao == 1){
+                listarProdutos(&estoque);
+            } else if(opcao == 2){
+                listarCategorias(&listaCategorias);
+            }
+
             break;
         case 6:
             // Implementar ordenação dos produtos
             break;
         case 7:
-            buscar_arquivo(&lista);
+            buscarTabelaProdutos(&estoque);
             break;
         case 8:
-            salvar_dados(&lista);
+            salvarTabelaProdutos(&estoque);
+            break;
         case 9:
             printf("Saindo do programa...\n");
             break;
         default:
             printf("Opcao invalida!\n");
+            break;
         }
     } while (opcao != 9);
 }
 
 int main()
 {
+    ESTOQUE estoque;
+    LISTA_CATEGORIAS listaCategorias;
 
-    LISTA lista;
-
-    inicializarLista(&lista);
-    menuAcoes(lista);
+    inicializarEstoqueEListaCategorias(&estoque, &listaCategorias);
+    menuAcoes(estoque, listaCategorias);
 
     return 0;
 }
